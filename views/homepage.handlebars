@@ -1,0 +1,16 @@
+<!-- views/homepage.handlebars -->
+
+<h1>Welcome to Tech Blog</h1>
+
+{{#each posts}}
+  <article>
+    <h2><a href="/post/{{this.id}}">{{this.title}}</a></h2>
+    <p>By {{this.user.username}} on {{format_date this.createdAt}}</p>
+  </article>
+{{/each}}
+
+{{#if posts.length}}
+  <!-- Pagination or other controls can go here -->
+{{else}}
+  <p>No posts yet!</p>
+{{/if}}

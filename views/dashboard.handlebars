@@ -1,0 +1,30 @@
+<!-- views/dashboard.handlebars -->
+
+<h1>Your Dashboard</h1>
+
+<button id="new-post-button">Add New Post</button>
+
+<section id="new-post-form" style="display: none;">
+  <h2>Create New Post</h2>
+  <form id="post-form">
+    <input type="text" name="title" id="post-title" placeholder="Post Title" required>
+    <textarea name="content" id="post-content" placeholder="Post Content" required></textarea>
+    <button type="submit">Create Post</button>
+  </form>
+</section>
+
+<h2>Your Posts</h2>
+
+{{#if posts.length}}
+  {{#each posts}}
+    <article>
+      <h3>{{this.title}}</h3>
+      <p>Created on {{format_date this.createdAt}}</p>
+      <a href="/post/{{this.id}}">View Post</a>
+      <button class="edit-post-button" data-id="{{this.id}}">Edit</button>
+      <button class="delete-post-button" data-id="{{this.id}}">Delete</button>
+    </article>
+  {{/each}}
+{{else}}
+  <p>You have not created any posts yet.</p>
+{{/if}}

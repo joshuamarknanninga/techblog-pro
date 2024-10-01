@@ -1,28 +1,22 @@
 // server.js
-
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const exphbs = require('express-handlebars');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const dotenv = require('dotenv');
-
-const routes = require('./controllers');
-const sequelize = require('./models').sequelize;
-
-dotenv.config();
+const sequelize = require('./config/connection');
+const routes = require('./controllers/api');
+const homeRoutes = require('./controllers/homeRoutes');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
-// Set up Handlebars.js as the template engine
-const hbs = exphbs.create({});
-
-// Configure session middleware
+// Set up session
 const sess = {
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'Super secret secret',
   cookie: {
-    maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    maxAge: 3600000, // 1 hour
   },
   resave: false,
   saveUninitialized: true,
@@ -33,21 +27,21 @@ const sess = {
 
 app.use(session(sess));
 
-// Inform Express.js on which template engine to use
+// Set up Handlebars.js as template engine
+const hbs = exphbs.create({});
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// Middleware to parse JSON and urlencoded form data
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Use routes
-app.use(routes);
+// Routes
+app.use('/', homeRoutes);
+app.use('/api', routes);
 
-// Sync Sequelize models to the database, then start the server
+// Sync sequelize models to the database, then start the server
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`Now listening on port ${PORT}`));
 });
