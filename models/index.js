@@ -1,28 +1,8 @@
-// models/index.js
-
-const Sequelize = require('sequelize');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const sequelize = new Sequelize(
-  process.env.tech_blog_db,
-  process.env.joshuamarknanninga,
-  process.env['12345'],
-  {
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    dialect: 'postgres',
-    dialectOptions: {
-      // Additional options if needed
-    },
-  }
-);
 
 // Import models
-const User = require('./User')(sequelize, Sequelize.DataTypes);
-const Post = require('./Post')(sequelize, Sequelize.DataTypes);
-const Comment = require('./Comment')(sequelize, Sequelize.DataTypes);
+const User = require('./User');
+const Post = require('./Post');
+const Comment = require('./Comment');
 
 // Define associations
 User.hasMany(Post, {
@@ -32,11 +12,6 @@ User.hasMany(Post, {
 
 Post.belongsTo(User, {
   foreignKey: 'user_id',
-});
-
-User.hasMany(Comment, {
-  foreignKey: 'user_id',
-  onDelete: 'CASCADE',
 });
 
 Comment.belongsTo(User, {
@@ -53,7 +28,7 @@ Comment.belongsTo(Post, {
 });
 
 module.exports = {
-  sequelize,
+
   User,
   Post,
   Comment,
