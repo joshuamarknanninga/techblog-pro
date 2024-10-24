@@ -8,11 +8,10 @@ const withAuth = require('../middleware/auth');
 router.get('/', async (req, res) => {
   try {
     const postData = await Post.findAll({
-      include: [{ model: User, attributes: ['username'] }],
-      order: [['createdAt', 'DESC']],
+      include: [{ model: User}]
     });
-
     const posts = postData.map((post) => post.get({ plain: true }));
+    console.log("PostDAta",posts)
 
     res.render('homepage', {
       posts,
@@ -20,6 +19,7 @@ router.get('/', async (req, res) => {
       username: req.session.username,
     });
   } catch (err) {
+    console.log(err,"Homeroute")
     res.status(500).json(err);
   }
 });
@@ -32,8 +32,7 @@ router.get('/post/:id', async (req, res) => {
         { model: User, attributes: ['username'] },
         { 
           model: Comment, 
-          include: [{ model: User, attributes: ['username'] }],
-          order: [['createdAt', 'DESC']],
+          include: [{ model: User}]
         },
       ],
     });
@@ -60,8 +59,7 @@ router.get('/dashboard', withAuth, async (req, res) => {
   try {
     const userPosts = await Post.findAll({
       where: { user_id: req.session.user_id },
-      include: [{ model: User, attributes: ['username'] }],
-      order: [['createdAt', 'DESC']],
+      include: [{ model: User}],
     });
 
     const posts = userPosts.map((post) => post.get({ plain: true }));

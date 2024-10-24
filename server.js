@@ -5,8 +5,8 @@ const session = require('express-session');
 const exphbs = require('express-handlebars');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const sequelize = require('./config/connection');
-const routes = require('./controllers/api');
-const homeRoutes = require('./controllers/homeRoutes');
+const routes = require('./controllers');
+// cont homeRoutes = require('./controllers/homeRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -38,8 +38,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
-app.use('/', homeRoutes);
-app.use('/api', routes);
+app.use('/', routes);
+// app.use('/api', routes);
 
 // Sync sequelize models to the database, then start the server
 sequelize.sync({ force: false }).then(() => {
