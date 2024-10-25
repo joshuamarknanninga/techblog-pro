@@ -1,22 +1,26 @@
-// server.js
+// Load environment variables from .env file
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const exphbs = require('express-handlebars');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const sequelize = require('./config/connection');
 const routes = require('./controllers');
-// cont homeRoutes = require('./controllers/homeRoutes');
-require('dotenv').config();
+const sequelize = require('./config/connection');
+const helpers = require('./utils/helpers'); // Import helpers
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
-// Set up session
+// Configure session middleware
 const sess = {
-  secret: process.env.SESSION_SECRET || 'Super secret secret',
+  secret: process.env.SESSION_SECRET,
   cookie: {
-    maxAge: 3600000, // 1 hour
+    maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    // secure: true, // Uncomment if using HTTPS
+    // httpOnly: true, // Helps prevent XSS
+    // sameSite: 'strict', // Helps prevent CSRF
   },
   resave: false,
   saveUninitialized: true,
@@ -27,21 +31,27 @@ const sess = {
 
 app.use(session(sess));
 
-// Set up Handlebars.js as template engine
-const hbs = exphbs.create({});
+// Initialize Handlebars engine with helpers
+const hbs = exphbs.create({ helpers });
+
+// Set Handlebars as the template engine
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
-// Middleware
+// Specify the views directory explicitly (optional but recommended)
+app.set('views', path.join(__dirname, 'views'));
+
+// Middleware for parsing JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.use('/', routes);
-// app.use('/api', routes);
+// Use routes defined in controllers
+app.use(routes);
 
-// Sync sequelize models to the database, then start the server
+// Sync sequelize models to the database, then turn on the server
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Now listening on port ${PORT}`));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });

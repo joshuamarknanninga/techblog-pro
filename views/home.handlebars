@@ -1,0 +1,16 @@
+{{!-- Set the page title --}}
+{{!-- You can pass the title from your route handler --}}
+{{!-- Example: res.render('home', { title: 'Home', ... }) --}}
+
+<h2>Welcome to TechBlog</h2>
+
+{{#if posts.length}}
+  {{#each posts}}
+    <article class="post">
+      <h3><a href="/post/{{this.id}}">{{this.title}}</a></h3>
+      <p>By {{this.user.username}} on {{format_date this.createdAt}}</p>
+    </article>
+  {{/each}}
+{{else}}
+  <p>No blog posts found. Be the first to <a href="/dashboard">create one</a>!</p>
+{{/if}}

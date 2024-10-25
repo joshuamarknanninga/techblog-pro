@@ -1,15 +1,18 @@
-<!-- views/login.handlebars -->
+{{!-- Set the page title --}}
+{{!-- Example: res.render('login', { title: 'Login' }) --}}
 
-<h1>Login</h1>
+<h2>Login</h2>
 
 <form id="login-form">
-  <label for="username">Username:</label>
-  <input type="text" name="username" id="username" required>
+  <div>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+  </div>
 
-  <label for="password">Password:</label>
-  <input type="password" name="password" id="password" required>
+  <div>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+  </div>
 
   <button type="submit">Login</button>
 </form>
-
-<p>Don't have an account? <a href="/signup">Sign up here</a>.</p>

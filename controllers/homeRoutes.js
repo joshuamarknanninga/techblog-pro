@@ -2,96 +2,70 @@
 
 const router = require('express').Router();
 const { Post, User, Comment } = require('../models');
-const withAuth = require('../middleware/auth');
+const withAuth = require('../utils/auth');
 
-// GET / - Homepage with all posts
+// GET homepage
 router.get('/', async (req, res) => {
   try {
     const postData = await Post.findAll({
-      include: [{ model: User}]
+      include: [{ model: User }],
+      order: [['createdAt', 'DESC']],
     });
+
     const posts = postData.map((post) => post.get({ plain: true }));
-    console.log("PostDAta",posts)
 
-    res.render('homepage', {
-      posts,
-      loggedIn: req.session.loggedIn,
-      username: req.session.username,
+    res.render('home', { 
+      title: 'Home',
+      posts, 
+      logged_in: req.session.logged_in 
     });
   } catch (err) {
-    console.log(err,"Homeroute")
+    console.error(err);
     res.status(500).json(err);
   }
 });
 
-// GET /post/:id - Single post view
-router.get('/post/:id', async (req, res) => {
-  try {
-    const postData = await Post.findByPk(req.params.id, {
-      include: [
-        { model: User, attributes: ['username'] },
-        { 
-          model: Comment, 
-          include: [{ model: User}]
-        },
-      ],
-    });
-
-    if (!postData) {
-      res.status(404).json({ message: 'No post found with this id' });
-      return;
-    }
-
-    const post = postData.get({ plain: true });
-
-    res.render('post', {
-      post,
-      loggedIn: req.session.loggedIn,
-      username: req.session.username,
-    });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// GET /dashboard - User dashboard
+// GET dashboard (protected route)
 router.get('/dashboard', withAuth, async (req, res) => {
   try {
     const userPosts = await Post.findAll({
       where: { user_id: req.session.user_id },
-      include: [{ model: User}],
+      include: [{ model: User }],
     });
 
     const posts = userPosts.map((post) => post.get({ plain: true }));
 
-    res.render('dashboard', {
-      posts,
-      loggedIn: true,
-      username: req.session.username,
+    res.render('dashboard', { 
+      title: 'Dashboard',
+      posts, 
+      logged_in: true 
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json(err);
   }
 });
 
-// GET /login - Login page
+// GET login page
 router.get('/login', (req, res) => {
-  if (req.session.loggedIn) {
+  // If the user is already logged in, redirect to the dashboard
+  if (req.session.logged_in) {
     res.redirect('/dashboard');
     return;
   }
 
-  res.render('login');
+  res.render('login', { title: 'Login' });
 });
 
-// GET /signup - Signup page
+// GET signup page
 router.get('/signup', (req, res) => {
-  if (req.session.loggedIn) {
+  // If the user is already logged in, redirect to the dashboard
+  if (req.session.logged_in) {
     res.redirect('/dashboard');
     return;
   }
 
-  res.render('signup');
+  res.render('signup', { title: 'Sign Up' });
 });
 
 module.exports = router;

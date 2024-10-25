@@ -1,11 +1,11 @@
-<!-- views/partials/navigation.handlebars -->
+{{!-- views/partials/navigation.handlebars --}}
 
 <nav>
   <ul>
     <li><a href="/">Home</a></li>
-    {{#if loggedIn}}
+    {{#if logged_in}}
       <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="#" id="logout">Logout ({{username}})</a></li>
+      <li><button id="logout">Logout</button></li>
     {{else}}
       <li><a href="/login">Login</a></li>
       <li><a href="/signup">Sign Up</a></li>
