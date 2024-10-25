@@ -1,15 +1,11 @@
-// controllers/index.js
+// Imports
+const router = require("express").Router();
+const apiRoutes = require("./api");
+const homeRoutes = require("./homeRoutes");
 
-const router = require('express').Router();
-const apiRoutes = require('./api');
-const homeRoutes = require('./homeRoutes'); // Ensure this line exists
+// Middleware
+router.use("/", homeRoutes);
+router.use("/api", apiRoutes);
 
-router.use('/', homeRoutes); // Use homeRoutes for the root path
-router.use('/api', apiRoutes); // Use apiRoutes for /api paths
-
-// Fallback route for 404 - Not Found
-router.use((req, res) => {
-  res.status(404).end();
-});
-
+// Exports
 module.exports = router;

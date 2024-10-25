@@ -1,26 +1,28 @@
-// Load environment variables from .env file
-require('dotenv').config();
+// Imports
+const path = require("path");
+const express = require("express");
+const session = require("express-session");
+const exphbs = require("express-handlebars");
+const routes = require("./controllers");
+const helpers = require("./utils/helpers");
 
-const path = require('path');
-const express = require('express');
-const session = require('express-session');
-const exphbs = require('express-handlebars');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const routes = require('./controllers');
-const sequelize = require('./config/connection');
-const helpers = require('./utils/helpers'); // Import helpers
+const sequelize = require("./config/connection");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
-// Configure session middleware
+// Set up Handlebars.js engine with custom helpers
+const hbs = exphbs.create({ helpers });
+
+// Sets session cookie properties
 const sess = {
-  secret: process.env.SESSION_SECRET,
+  secret: "Super secret secret",
   cookie: {
-    maxAge: 2 * 60 * 60 * 1000, // 2 hours
-    // secure: true, // Uncomment if using HTTPS
-    // httpOnly: true, // Helps prevent XSS
-    // sameSite: 'strict', // Helps prevent CSRF
+    maxAge: 1200000,
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
   },
   resave: false,
   saveUninitialized: true,
@@ -31,27 +33,18 @@ const sess = {
 
 app.use(session(sess));
 
-// Initialize Handlebars engine with helpers
-const hbs = exphbs.create({ helpers });
+// Inform Express.js on which template engine to use
+app.engine("handlebars", hbs.engine);
+app.set("view engine", "handlebars");
 
-// Set Handlebars as the template engine
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
-
-// Specify the views directory explicitly (optional but recommended)
-app.set('views', path.join(__dirname, 'views'));
-
-// Middleware for parsing JSON and URL-encoded data
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Use routes defined in controllers
 app.use(routes);
 
-// Sync sequelize models to the database, then turn on the server
+// Syncs sequelize with database
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => console.log("Now listening"));
 });
