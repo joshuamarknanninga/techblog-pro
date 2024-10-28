@@ -1,30 +1,26 @@
-// config/connection.js
-
+// connection.js
 const Sequelize = require('sequelize');
 require('dotenv').config();
 
-// Determine if the environment is production
-const isProduction = process.env.NODE_ENV === 'production';
+let sequelize;
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,      // Database name
-  process.env.DB_USERNAME,  // Username
-  process.env.DB_PASSWORD,  // Password
-  {
-    host: process.env.DB_HOST || 'localhost',
-    dialect: 'postgres',    // Specify PostgreSQL dialect
-    port: process.env.DB_PORT || 5432, // Default PostgreSQL port
-    dialectOptions: isProduction
-      ? {
-          ssl: {
-            require: true,
-            rejectUnauthorized: false, // Allow self-signed certificates
-          },
-        }
-      : {},
-    logging: false, // Disable logging; set to console.log to enable
+try {
+  if (process.env.JAWSDB_URL) {
+    sequelize = new Sequelize(process.env.JAWSDB_URL);
+  } else {
+    sequelize = new Sequelize(
+      process.env.DB_NAME,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      {
+        host: 'localhost',
+        dialect: 'mysql',
+        port: 3306,
+      }
+    );
   }
-);
+} catch (error) {
+  console.error('Unable to connect to the database:', error);
+}
 
 module.exports = sequelize;
-
