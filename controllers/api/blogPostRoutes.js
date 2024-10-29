@@ -1,8 +1,6 @@
-// blogPostRoutes.js
 const router = require('express').Router();
-const { BlogPost } = require('../../models');
-const withAuth = require('../../utils/auth');
-const blogService = require('../../services/blogService'); // New Service
+const { withAuth } = require('../../utils/auth'); // Make sure to destructure it correctly
+const blogService = require('../../services/blogService');
 
 // POST a new blog post
 router.post('/', withAuth, async (req, res) => {
