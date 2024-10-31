@@ -1,4 +1,4 @@
-const { BlogPost } = require('../models');
+const { BlogPost } = require('../server/models');
 
 const createBlogPost = async (postData, userId) => {
   const newBlogPost = await BlogPost.create({
